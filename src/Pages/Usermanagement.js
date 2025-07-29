@@ -40,7 +40,7 @@ const UserManagementPage = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/users/getallusers', {
+        const res = await fetch('https://billingsoftware-back-end.onrender.com/api/users/getallusers', {
           headers: { token },
         });
         const data = await res.json();
@@ -57,7 +57,7 @@ const UserManagementPage = () => {
   const handleDeleteUser = async (userId) => {
   if (!window.confirm('Are you sure you want to delete this user?')) return;
   try {
-    const response = await fetch(`http://localhost:8000/api/users/delete/${userId}`, {
+    const response = await fetch(`https://billingsoftware-back-end.onrender.com/api/users/delete/${userId}`, {
       method: 'DELETE',
       headers: { token },
     });

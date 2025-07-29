@@ -108,7 +108,7 @@ paymentStatus
     };
 
     try {
-      const res = await fetch('http://localhost:8000/api/bills/create', {
+      const res = await fetch('https://billingsoftware-back-end.onrender.com/api/bills/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

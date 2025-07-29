@@ -30,7 +30,7 @@ const CreateOrEditAdminPage = () => {
       // Editing: Fetch user details to pre-fill fields
       (async () => {
         try {
-          const res = await fetch(`http://localhost:8000/api/users/getusersbyid/${id}`, {
+          const res = await fetch(`http://billingsoftware-back-end.onrender.com/api/users/getusersbyid/${id}`, {
             headers: { token }
           });
           const user = await res.json();
@@ -67,36 +67,70 @@ const CreateOrEditAdminPage = () => {
     return Object.keys(err).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validate()) return;
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!validate()) return;
 
-    setLoading(true);
-    setErrorMsg('');
-    try {
-      if (id) {
-        // Edit user
-        const response = await fetch(`http://localhost:8000/api/users/updateuser/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', token },
-          body: JSON.stringify({ ...fields, role })
-        });
-        if (!response.ok) throw new Error('Failed to update user');
-      } else {
-        // Create admin
-        const response = await fetch('http://localhost:8000/api/users/createadmin', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', token },
-          body: JSON.stringify({ ...fields, role })
-        });
-        if (!response.ok) throw new Error('Failed to create user');
+  setLoading(true);
+  setErrorMsg('');
+
+  try {
+    let response;
+    if (id) {
+      // Edit user
+      response = await fetch(`https://billingsoftware-back-end.onrender.com/api/users/updateuser/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          token,
+        },
+        body: JSON.stringify({ ...fields }),
+      });
+
+      const result = await response.json();
+      console.log("Update user response:", response.status, result);
+      if (!response.ok) {
+        throw new Error(result?.error || 'Failed to update user');
       }
-      navigate('/users');
-    } catch (err) {
-      setErrorMsg(err.message || 'Error occurred');
+
+    } else {
+      // Create admin
+      response = await fetch('https://billingsoftware-back-end.onrender.com/api/users/createadmin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          token,
+        },
+        body: JSON.stringify({
+          name: fields.name,
+          email: fields.email,
+          password: fields.password,
+          number: fields.number,
+          status: fields.status,
+          role: "Admin",
+        }),
+      });
+
+      const result = await response.json();
+      console.log("Create user response:", response.status, result);
+      if (response.status !== 201) {
+        throw new Error(result?.error || 'Failed to create user');
+      }
     }
-    setLoading(false);
-  };
+
+    alert("User saved successfully!");
+    navigate('/users');
+  } catch (err) {
+    setErrorMsg(err.message || 'Error occurred');
+  }
+
+  setLoading(false);
+};
+
+
+ console.log('Sending token:', token);
+console.log('Request body:', { ...fields });
+
 
   return (
     <Container maxWidth="sm" sx={{ py: 6 }}>

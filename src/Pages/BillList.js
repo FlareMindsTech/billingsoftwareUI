@@ -39,7 +39,7 @@ const [paymentStatus, setPaymentStatus] = useState('');
 
 
       const response = await fetch(
-        `http://localhost:8000/api/bills/getall?${params.toString()}`,
+        `https://billingsoftware-back-end.onrender.com/api/bills/getall?${params.toString()}`,
         {
           headers: {
             token: token // ✅ direct token header
