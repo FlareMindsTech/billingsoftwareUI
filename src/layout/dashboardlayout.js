@@ -53,12 +53,12 @@ const DashboardLayout = ({ children }) => {
             boxShadow: 4,
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between',
+            // justifyContent: 'space-between',
             minHeight: '100vh',
           },
         }}
       >
-        <Toolbar sx={{ justifyContent: 'center', py: 3 }}>
+        <Toolbar sx={{ justifyContent: 'center', py: 3  }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Box
               sx={{
@@ -85,7 +85,7 @@ const DashboardLayout = ({ children }) => {
                 }}
               />
             </Box>
-            <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: 1, color: 'primary.main' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: 0.5, color: 'primary.main' }}>
               Tritech Systems
             </Typography>
           </Box>

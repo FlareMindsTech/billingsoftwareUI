@@ -210,10 +210,11 @@ const [paymentStatus, setPaymentStatus] = useState('');
                     <TableCell>{new Date(bill.createdAt).toLocaleDateString()}</TableCell>
                     <TableCell align="right">{bill.totalAmount.toFixed(2)}</TableCell>
                     <TableCell>
-                    <Typography fontWeight="bold" color={bill.paymentStatus === 'Paid' ? 'green' : 'red'}>
-                    {bill.paymentStatus}
-                    </Typography>
-                    </TableCell>
+  <Typography fontWeight="bold" color={bill.paymentStatus === 'Paid' ? 'green' : 'red'}>
+    {bill.paymentStatus}
+  </Typography>
+</TableCell>
+
                     <TableCell>{bill.createdBy?.name || 'N/A'}</TableCell>
                     <TableCell>
         <Button

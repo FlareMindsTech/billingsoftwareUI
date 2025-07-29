@@ -8,6 +8,8 @@ import {
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SaveIcon from '@mui/icons-material/Save';
+import { Switch, FormControlLabel } from '@mui/material';
+
 
 const hsnOptions = [
   { code: '998595', label: 'Hazardous Waste Services' },
@@ -25,6 +27,7 @@ const DashboardPage = () => {
     billNo: '',
     date: new Date().toISOString().slice(0, 10),
   });
+  const [isGstEnabled, setIsGstEnabled] = useState(true);
 
   const [items, setItems] = useState([
     { description: '', quantity: 1, price: 0, gst: 18, hsnCode: '' }
@@ -42,6 +45,17 @@ const DashboardPage = () => {
     setItems(updated);
   };
 
+  const handleGstToggle = () => {
+  const newGstState = !isGstEnabled;
+  setIsGstEnabled(newGstState);
+  setItems((prevItems) =>
+    prevItems.map((item) => ({
+      ...item,
+      gst: newGstState ? 18 : 0
+    }))
+  );
+};
+
   const addItem = () => {
     setItems([...items, { description: '', quantity: 1, price: 0, gst: 18, hsnCode: '' }]);
   };
@@ -57,17 +71,21 @@ const DashboardPage = () => {
     return (totalWithoutGst + gstAmount).toFixed(2);
   };
 
-const gstRate = 18;
-const cgstRate = gstRate / 2;
-const sgstRate = gstRate / 2;
-
 const subtotal = items.reduce((sum, item) => sum + item.quantity * item.price, 0);
-const totalCgst = items.reduce((sum, item) => sum + ((item.quantity * item.price) * cgstRate) / 100, 0);
-const totalSgst = items.reduce((sum, item) => sum + ((item.quantity * item.price) * sgstRate) / 100, 0);
+
+const totalCgst = isGstEnabled
+  ? items.reduce((sum, item) => sum + ((item.quantity * item.price) * (item.gst / 2)) / 100, 0)
+  : 0;
+
+const totalSgst = isGstEnabled
+  ? items.reduce((sum, item) => sum + ((item.quantity * item.price) * (item.gst / 2)) / 100, 0)
+  : 0;
+
 const totalGst = totalCgst + totalSgst;
 
 const totalAmount = subtotal + totalGst;
 const balance = totalAmount - paidAmount;
+
 
   const paymentStatus = balance === 0 ? 'Paid' : 'Unpaid';
 
@@ -78,7 +96,7 @@ const balance = totalAmount - paidAmount;
   description: item.description,
   quantity: item.quantity,
   price: item.price,
-  gstRate: 18,
+  gstRate: isGstEnabled ? item.gst : 0,
   hsnCode: item.hsnCode
 })),
 subTotal: subtotal,
@@ -111,14 +129,22 @@ paymentStatus
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Paper elevation={3} sx={{ p: 4, borderRadius: 4 }}>
         {/* Company Header */}
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" fontWeight="bold" color="primary">Tritech Systems</Typography>
-          <Typography gutterBottom>17 A, Kumaran Colony, Ammapalayam, Tiruppur, Tamil Nadu, 641654</Typography>
-          <Typography gutterBottom>Cell: 8940644004 | Email: tritechsystems2011@gmail.com</Typography>
-          <Typography>GSTIN: 33FCJPS9117J1Z3 | PAN: FCJPS9117J</Typography>
-        </Box>
-
+       <Box sx={{ mb: 4, textAlign: 'center' }}>
+  <Typography variant="h4" fontWeight="bold" color="primary">
+    Tritech Systems
+  </Typography>
+  <Typography gutterBottom>
+    17 A, Kumaran Colony, Ammapalayam, Tiruppur, Tamil Nadu, 641654
+  </Typography>
+  <Typography gutterBottom>
+    Cell: 8940644004 | Email: tritechsystems2011@gmail.com
+  </Typography>
+  <Typography>
+    GSTIN: 33FCJPS9117J1Z3 | PAN: FCJPS9117J
+  </Typography>
+</Box>
         {/* Customer Details */}
+        
         <Grid container spacing={2} mb={3}>
           <Grid item xs={12} sm={6}>
             <TextField label="Customer Name" fullWidth value={billInfo.customerName}
@@ -155,7 +181,11 @@ paymentStatus
                 <TableCell>HSN Code</TableCell>
                 <TableCell>Qty</TableCell>
                 <TableCell>Price</TableCell>
-                <TableCell>GST %</TableCell>
+                <FormControlLabel
+  control={<Switch checked={isGstEnabled} onChange={handleGstToggle} />}
+  label={`GST ${isGstEnabled ? 'ON ' : 'OFF'}`}
+/>
+
                 <TableCell>Total</TableCell>
                 <TableCell>Delete</TableCell>
               </TableRow>
@@ -210,15 +240,18 @@ paymentStatus
 
         {/* Totals */}
         <Box mt={4}>
-          <Grid container justifyContent="flex-end" spacing={1}>
-            <Grid item xs={6} sm={3}><Typography>Subtotal:</Typography></Grid>
-            <Grid item xs={6} sm={2}><Typography align="right">{subtotal.toFixed(2)}</Typography></Grid>
-
-            <Grid item xs={6} sm={3}><Typography>Total GST:</Typography></Grid>
-            <Grid item xs={6} sm={2}><Typography align="right">{totalGst.toFixed(2)}</Typography></Grid>
-
-            <Grid item xs={6} sm={3}><Typography variant="h6">Total:</Typography></Grid>
-            <Grid item xs={6} sm={2}><Typography variant="h6" align="right">{totalAmount.toFixed(2)}</Typography></Grid>
+          <Box mt={4} sx={{ textAlign: 'right', pr: 2 }}>
+  <Typography variant="body1">
+    <strong>Subtotal:</strong> {subtotal.toFixed(2)}
+  </Typography>
+  <Typography variant="body1">
+    <strong>Total GST:</strong> {totalGst.toFixed(2)}
+  </Typography>
+  <Typography variant="h6">
+    <strong>Total:</strong> {totalAmount.toFixed(2)}
+  </Typography>
+</Box>
+          <Grid container spacing={2} mt={2}>
 
             <Grid item xs={6} sm={3}><Typography>Paid Amount:</Typography></Grid>
             <Grid item xs={6} sm={2}>

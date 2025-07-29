@@ -64,22 +64,23 @@ export const generateBillPdf = async (bill) => {
   doc.text(`GSTIN: ${bill.customerGstin}`, marginX + 10, y); y += lineHeight + 2;
 
   doc.text(`Date: ${moment(bill.date || bill.createdAt).format('DD/MM/YYYY')}`, marginX, y);
-  doc.text(`PO No: ${bill.poNo || '-'}`, marginX + 60, y);
+  // doc.text(`PO No: ${bill.poNo || '-'}`, marginX + 60, y);
   doc.text(`Bill No: ${bill.billNo}`, pageWidth - 60, y); y += lineHeight;
   doc.text(`Vehicle No: ${bill.vehicleNo || '-'}`, marginX, y); y += lineHeight + 2;
 
   // Items
-  const itemRows = bill.items.map((item, index) => [
-    index + 1,
-    item.description,
-    item.quantity,
-    `Rs.${item.price.toFixed(2)}`,
-    `Rs.${(item.quantity * item.price).toFixed(2)}`
-  ]);
+const itemRows = bill.items.map((item, index) => [
+  index + 1,
+  item.description,
+  item.hsnCode || '-', // new column
+  item.quantity,
+  `Rs.${item.price.toFixed(2)}`,
+  `Rs.${(item.quantity * item.price).toFixed(2)}`
+]);
 
-  autoTable(doc, {
-    startY: y,
-    head: [['S.No', 'Particulars', 'Qty', 'Rate', 'Amount']],
+autoTable(doc, {
+  startY: y,
+  head: [['S.No', 'Item', 'HSN Code', 'Qty', 'Rate', 'Amount']],
     body: itemRows,
     theme: 'grid',
     styles: { fontSize: 9 },
@@ -90,8 +91,8 @@ export const generateBillPdf = async (bill) => {
 
   // HSN & Tax
  doc.setFont('helvetica', 'bold');
-doc.text('HSN CODE: 998595', marginX, y);
-y += lineHeight;
+// doc.text('HSN CODE: 998595', marginX, y);
+// y += lineHeight;
 
 const cgst = (bill.totalGst ?? 0) / 2;
 const sgst = (bill.totalGst ?? 0) / 2;
