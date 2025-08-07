@@ -5,6 +5,7 @@ import ReceiptIcon from '@mui/icons-material/Receipt';
 import PeopleIcon from '@mui/icons-material/People';
 import LogoutIcon from '@mui/icons-material/Logout';
 import logiright from '../images/logi-right.png';
+import stsoftware from '../images/ST Logo.jpg';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/Authcontext';
@@ -54,7 +55,7 @@ const DashboardLayout = ({ children }) => {
             display: 'flex',
             flexDirection: 'column',
             // justifyContent: 'space-between',
-            minHeight: '100vh',
+            minHeight: '100vh',  
           },
         }}
       >
@@ -113,6 +114,24 @@ const DashboardLayout = ({ children }) => {
             </ListItem>
           ))}
         </List>
+        <Box sx={{ textAlign: 'center',py: 2, mt: 'auto', mb: 3 }}>
+    <Box
+      component="img"
+      src={stsoftware}
+      alt="Tritech Footer Logo"
+      sx={{
+        width: 200,
+        height: 80,
+        borderRadius: 2,
+        mx: 'auto',
+        // boxShadow: 2,
+        bgcolor: 'white',
+      }}
+    />
+    <Typography variant="caption" sx={{ mt: 1, display: 'block', color: 'primary.main' }}>
+      © 2025 ST Software Solutions
+    </Typography>
+  </Box>
       </Drawer>
       <Box
         sx={{
@@ -129,6 +148,7 @@ const DashboardLayout = ({ children }) => {
       >
         {children}
       </Box>
+      
     </Box>
   );
 };

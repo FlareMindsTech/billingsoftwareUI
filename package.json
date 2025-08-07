@@ -22,13 +22,13 @@
   },
   "scripts": {
   "start": "react-scripts start",
-  "build": "cd billingsoftwareUI && npm run build",
+  "build": " npm run build",
   "desktop": "npm run build && electron .",
   "package-win": "electron-packager . BillingApp --platform=win32 --arch=x64 --out=dist --overwrite"
 },
 
   "eslintConfig": {
-    "extends": [
+    "extends": [   
       "react-app",
       "react-app/jest"
     ]

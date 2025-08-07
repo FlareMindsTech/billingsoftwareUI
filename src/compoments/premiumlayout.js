@@ -110,15 +110,26 @@ const PremiumLayout = ({ children }) => {
                 sx={{ width: 45, height: 45, borderRadius: 1, bgcolor: 'white', boxShadow: 1 }}
               />
               <Typography variant="h5" sx={{ fontWeight: 700, letterSpacing: 1 }}>
-                Tritech Billing Software
+                Tritech Billing Software ssssss
               </Typography>
             </Box>
           </Toolbar>
-        </AppBar>
+        </AppBar> 
         <Toolbar /> 
         <Box sx={{ p: { xs: 2, md: 4 }, mt: 2 }}>
           {children}
         </Box>
+        <Box sx={{ textAlign: 'center', py: 2 }}>
+    <Box
+      component="img"
+      src={logo1}
+      alt="Bottom Logo"
+      sx={{ width: 60, height: 60, borderRadius: 2, bgcolor: 'white', mx: 'auto', boxShadow: 2 }}
+    />
+    <Typography variant="caption" sx={{ color: 'white', mt: 1 }}>
+      © 2025 Tritech
+    </Typography>
+  </Box>
       </Box>
     </Box>
   );

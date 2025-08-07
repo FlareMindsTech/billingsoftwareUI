@@ -27,37 +27,40 @@ const [paymentStatus, setPaymentStatus] = useState('');
   const dateOptions = ['', 'Today', 'This Week', 'This Month', 'Custom'];
 
   const fetchBills = async (filters = {}) => {
-    try {
-      const params = new URLSearchParams();
+  try {
+    const params = new URLSearchParams();
 
-      if (filters.dateRange) params.append('dateRange', filters.dateRange);
-      if (filters.startDate) params.append('startDate', filters.startDate);
-      if (filters.endDate) params.append('endDate', filters.endDate);
-      if (filters.customerName) params.append('name', filters.customerName);
-      if (filters.search) params.append('search', filters.search);
-      if (filters.paymentStatus) params.append('status', filters.paymentStatus);
+    if (filters.dateRange) params.append('dateRange', filters.dateRange);
+    if (filters.startDate) params.append('startDate', filters.startDate);
+    if (filters.endDate) params.append('endDate', filters.endDate);
+    if (filters.customerName) params.append('name', filters.customerName);
+    if (filters.search) params.append('search', filters.search);
+    if (filters.paymentStatus) params.append('status', filters.paymentStatus);
 
-
-      const response = await fetch(
-        `https://billingsoftware-back-end.onrender.com/api/bills/getall?${params.toString()}`,
-        {
-          headers: {
-            token: token // ✅ direct token header
-          }
+    const response = await fetch(
+      `https://billingsoftware-back-end.onrender.com/api/bills/getall?${params.toString()}`,
+      {
+        headers: {
+          token: token
         }
-      );
+      }
+    );
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) throw new Error(data.message || 'Failed to fetch bills');
+    if (!response.ok) throw new Error(data.message || 'Failed to fetch bills');
 
-      setBills(data);
-      setLoading(false);
-    } catch (err) {
-      setError(err.message || 'Something went wrong');
-      setLoading(false);
-    }
-  };
+    // ✅ Sort by createdAt descending
+    const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    setBills(sortedData);
+    setLoading(false);
+  } catch (err) {
+    setError(err.message || 'Something went wrong');
+    setLoading(false);
+  }
+};
+
 
   const handleFilter = (e) => {
     e.preventDefault();
