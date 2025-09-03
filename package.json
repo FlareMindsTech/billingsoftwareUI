@@ -24,8 +24,13 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+  "electron-dev": "concurrently \"npm run start\" \"wait-on http://localhost:3000 && electron .\"",
+  "electron-build": "npm run build && electron .",
+  "package": "electron-packager . billing-app --platform=linux --arch=x64 --out=dist --overwrite"
+}
+  ,
 
   "eslintConfig": {
     "extends": [

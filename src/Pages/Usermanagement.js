@@ -42,7 +42,7 @@ const UserManagementPage = () => {
       try {
         const res = await fetch('https://billingsoftware-back-end.onrender.com/api/users/getallusers', {
           headers: { token },
-        });
+        }); 
         const data = await res.json();
         setUsers(data);
       } catch (err) {
