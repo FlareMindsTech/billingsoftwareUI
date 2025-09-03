@@ -145,6 +145,190 @@
 // }
 
 
+// import { jsPDF } from 'jspdf';
+// import autoTable from 'jspdf-autotable';
+// import moment from 'moment';
+// import logoleft from '../images/logi-right.png';
+// import logoRight from '../images/logo-left.png';
+// import { getBase64ImageFromUrl } from './getBase64Image';
+
+// export const generateBillPdf = async (bill) => {
+//   const leftLogoBase64 = await getBase64ImageFromUrl(logoleft);
+//   const rightLogoBase64 = await getBase64ImageFromUrl(logoRight);
+
+//   const doc = new jsPDF();
+//   const lineHeight = 7;
+//   const marginX = 14;
+//   const pageWidth = doc.internal.pageSize.getWidth();
+//   const pageHeight = doc.internal.pageSize.getHeight();
+//   let y = 10;
+
+//   const labelX = pageWidth - 90;
+//   const valueX = pageWidth - marginX;
+//   const alignRight = { align: 'right' };
+
+//   // Logos
+//   doc.addImage(leftLogoBase64, 'PNG', 10, y, 30, 30);
+//   doc.addImage(rightLogoBase64, 'PNG', pageWidth - 40, y, 30, 30);
+
+//   // TAX BILL
+//   doc.setFontSize(10).setFont('helvetica', 'bold').setTextColor(0, 0, 0);
+//   doc.text('TAX BILL', pageWidth / 2, y + 5, { align: 'center' });
+
+//   y += 18;
+
+//   // Company Name - Red
+//   doc.setFontSize(14).setFont('helvetica', 'bold').setTextColor(255, 0, 0);
+//   doc.text('TRITECH SYSTEMS', pageWidth / 2, y, { align: 'center' });
+
+//   y += lineHeight;
+
+//   // Green sub text
+//   doc.setFontSize(10).setTextColor(0, 150, 0);
+//   doc.text('All Kind Of HazardousWaste & Non Hazardous waste service care:', pageWidth / 2, y, { align: 'center' });
+
+//   y += lineHeight;
+
+//   // Contact Info
+//   doc.setFontSize(9).setFont('helvetica', 'normal').setTextColor(0, 0, 0);
+//   doc.text('17 A, Kumaran Colony, Ammapalayam, Tirupur, Tamil Nadu, 641654,', pageWidth / 2, y, { align: 'center' }); y += lineHeight;
+//   doc.text('Cell No: 8940644004.', pageWidth / 2, y, { align: 'center' }); y += lineHeight;
+//   doc.text('Email Id: tritechsystems2011@gmail.com', pageWidth / 2, y, { align: 'center' });
+
+//   y += lineHeight;
+
+//   // GST & PAN
+//   const gstin = 'GSTIN: 33FCJPS9117J1Z3';
+//   const pan = 'PAN No: FCJPS9117J';
+//   const middle = pageWidth / 2;
+//   const gstinWidth = doc.getTextWidth(gstin);
+//   doc.setFont('helvetica', 'bold');
+//   doc.text(gstin, middle - gstinWidth / 2 - 20, y);
+//   doc.text(pan, middle + 20, y);
+
+//   y += lineHeight + 4;
+
+//   // Bill To + Date/Bill/Vehicle (both sides)
+//   const billDate = moment(bill.date || bill.createdAt).format('DD/MM/YYYY');
+//   doc.setFontSize(10).setFont('helvetica', 'normal');
+
+//   doc.text('To:', marginX, y);
+//   doc.text('Date:', labelX, y);
+//   doc.text(billDate, valueX, y, alignRight);
+//   y += lineHeight;
+
+//   doc.text(`M/S. ${bill.customerName}`, marginX + 10, y);
+//   doc.text('Bill No:', labelX, y);
+//   doc.text(`${bill.billNo}`, valueX, y, alignRight);
+//   y += lineHeight;
+
+//   doc.text(`${bill.customerAddress}`, marginX + 10, y);
+//   doc.text('Vehicle No:', labelX, y);
+//   doc.text(`${bill.vehicleNo || '-'}`, valueX, y, alignRight);
+//   y += lineHeight;
+
+//   doc.text(`GSTIN: ${bill.customerGstin}`, marginX + 10, y);
+//   y += lineHeight + 2;
+
+//   // Items Table
+//   const itemRows = bill.items.map((item, index) => [
+//     index + 1,
+//     `${item.description}`,
+//     `${item.hsnCode || '-'}`,
+//     item.quantity,
+//     `Rs.${item.price.toFixed(2)}`,
+//     `Rs.${(item.quantity * item.price).toFixed(2)}`
+//   ]);
+
+//   autoTable(doc, {
+//     startY: y,
+//     head: [['S.No', 'Description', 'HSN Code', 'Qty', 'Rate', 'Amount']],
+//     body: itemRows,
+//     theme: 'grid',
+//     styles: { fontSize: 9, cellPadding: 2 },
+//     columnStyles: {
+//       0: { halign: 'center', cellWidth: 10 },
+//       2: { halign: 'center', cellWidth: 15 },
+//       3: { halign: 'right', cellWidth: 25 },
+//       4: { halign: 'right', cellWidth: 30 },
+//     },
+//     margin: { left: marginX, right: marginX }
+//   });
+
+//   y = doc.lastAutoTable.finalY + 6;
+
+//   // GST & Net Amount
+//   const cgst = (bill.totalGst ?? 0) / 2;
+//   const sgst = (bill.totalGst ?? 0) / 2;
+
+//   doc.setFont('helvetica', 'normal');
+//   doc.text('ADD: CGST 9%', labelX, y);
+//   doc.text(`Rs.${cgst.toFixed(2)}`, valueX, y, alignRight);
+//   y += lineHeight;
+
+//   doc.text('ADD: SGST 9%', labelX, y);
+//   doc.text(`Rs.${sgst.toFixed(2)}`, valueX, y, alignRight);
+//   y += lineHeight + 2;
+
+//   doc.setFont('helvetica', 'bold');
+//   doc.text('NET AMOUNT', labelX, y);
+//   doc.text(`Rs.${(bill.totalAmount ?? 0).toFixed(2)}`, valueX, y, alignRight);
+//   y += lineHeight;
+
+//   doc.setFont('helvetica', 'normal');
+//   doc.text(`Rupees In Words: ${convertToWords(Math.round(bill.totalAmount))} Only`, marginX, y);
+//   y += lineHeight + 6;
+
+//   // Bank Details
+//   doc.setFont('helvetica', 'bold').text('BANK DETAILS:', marginX, y);
+//   y += lineHeight;
+
+//   autoTable(doc, {
+//     startY: y,
+//     head: [['BANK NAME', 'TAMILNADU MERCANTILE BANK', 'KOTAK MAHINDRA BANK']],
+//     body: [
+//       ['A/C NUMBER', '384150050800454', '8940644004'],
+//       ['IFSC CODE', 'TMBL0000384', 'KKBK0008664'],
+//       ['BRANCH', 'TIRUPUR, AMMAPALAYAM', 'TIRCH ROAD, COIMBATORE'],
+//     ],
+//     theme: 'grid',
+//     styles: { fontSize: 9, halign: 'left' },
+//     headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold' },
+//     margin: { left: marginX, right: marginX },
+//     columnStyles: {
+//       0: { cellWidth: 20 },
+//       1: { cellWidth: 35 },
+//       2: { cellWidth: 35 },
+//     },
+//   });
+
+//   // Signature (bottom of page)
+//   const bottomY = pageHeight - 30;
+//   doc.setFont('helvetica', 'bold');
+//   doc.text('For TRITECH SYSTEMS', pageWidth - 70, bottomY);
+//   doc.setFont('helvetica', 'normal');
+//   doc.text('PROPRIETOR', pageWidth - 45, bottomY + lineHeight);
+
+//   doc.save(`BILL-${bill.billNo || 'Unknown'}.pdf`);
+// };
+
+// // Amount to Words Converter (Indian Format)
+// function convertToWords(num) {
+//   const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+//     'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+//     'Seventeen', 'Eighteen', 'Nineteen'];
+//   const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+//   if ((num = num.toString()).length > 9) return 'Overflow';
+//   let n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
+//   if (!n) return;
+//   let str = '';
+//   str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + ' Crore ' : '';
+//   str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + ' Lakh ' : '';
+//   str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + ' Thousand ' : '';
+//   str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + ' Hundred ' : '';
+//   str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) + ' ' : '';
+//   return str.trim();
+// }
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import moment from 'moment';
@@ -157,80 +341,17 @@ export const generateBillPdf = async (bill) => {
   const rightLogoBase64 = await getBase64ImageFromUrl(logoRight);
 
   const doc = new jsPDF();
-  const lineHeight = 7;
-  const marginX = 14;
   const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  let y = 10;
 
-  const labelX = pageWidth - 90;
-  const valueX = pageWidth - marginX;
-  const alignRight = { align: 'right' };
-
-  // Logos
-  doc.addImage(leftLogoBase64, 'PNG', 10, y, 30, 30);
-  doc.addImage(rightLogoBase64, 'PNG', pageWidth - 40, y, 30, 30);
-
-  // TAX BILL
-  doc.setFontSize(10).setFont('helvetica', 'bold').setTextColor(0, 0, 0);
-  doc.text('TAX BILL', pageWidth / 2, y + 5, { align: 'center' });
-
-  y += 18;
-
-  // Company Name - Red
-  doc.setFontSize(14).setFont('helvetica', 'bold').setTextColor(255, 0, 0);
-  doc.text('TRITECH SYSTEMS', pageWidth / 2, y, { align: 'center' });
-
-  y += lineHeight;
-
-  // Green sub text
-  doc.setFontSize(10).setTextColor(0, 150, 0);
-  doc.text('All Kind Of HazardousWaste & Non Hazardous waste service care:', pageWidth / 2, y, { align: 'center' });
-
-  y += lineHeight;
-
-  // Contact Info
-  doc.setFontSize(9).setFont('helvetica', 'normal').setTextColor(0, 0, 0);
-  doc.text('17 A, Kumaran Colony, Ammapalayam, Tirupur, Tamil Nadu, 641654,', pageWidth / 2, y, { align: 'center' }); y += lineHeight;
-  doc.text('Cell No: 8940644004.', pageWidth / 2, y, { align: 'center' }); y += lineHeight;
-  doc.text('Email Id: tritechsystems2011@gmail.com', pageWidth / 2, y, { align: 'center' });
-
-  y += lineHeight;
-
-  // GST & PAN
-  const gstin = 'GSTIN: 33FCJPS9117J1Z3';
-  const pan = 'PAN No: FCJPS9117J';
-  const middle = pageWidth / 2;
-  const gstinWidth = doc.getTextWidth(gstin);
-  doc.setFont('helvetica', 'bold');
-  doc.text(gstin, middle - gstinWidth / 2 - 20, y);
-  doc.text(pan, middle + 20, y);
-
-  y += lineHeight + 4;
-
-  // Bill To + Date/Bill/Vehicle (both sides)
   const billDate = moment(bill.date || bill.createdAt).format('DD/MM/YYYY');
-  doc.setFontSize(10).setFont('helvetica', 'normal');
+  const cgst = (bill.totalGst ?? 0) / 2;
+  const sgst = (bill.totalGst ?? 0) / 2;
 
-  doc.text('To:', marginX, y);
-  doc.text('Date:', labelX, y);
-  doc.text(billDate, valueX, y, alignRight);
-  y += lineHeight;
+  // Add Logos first
+  doc.addImage(leftLogoBase64, 'PNG', 10, 8, 25, 25);
+  doc.addImage(rightLogoBase64, 'PNG', pageWidth - 35, 8, 25, 25);
 
-  doc.text(`M/S. ${bill.customerName}`, marginX + 10, y);
-  doc.text('Bill No:', labelX, y);
-  doc.text(`${bill.billNo}`, valueX, y, alignRight);
-  y += lineHeight;
-
-  doc.text(`${bill.customerAddress}`, marginX + 10, y);
-  doc.text('Vehicle No:', labelX, y);
-  doc.text(`${bill.vehicleNo || '-'}`, valueX, y, alignRight);
-  y += lineHeight;
-
-  doc.text(`GSTIN: ${bill.customerGstin}`, marginX + 10, y);
-  y += lineHeight + 2;
-
-  // Items Table
+  // Prepare item rows
   const itemRows = bill.items.map((item, index) => [
     index + 1,
     `${item.description}`,
@@ -240,51 +361,66 @@ export const generateBillPdf = async (bill) => {
     `Rs.${(item.quantity * item.price).toFixed(2)}`
   ]);
 
+  // Main table (everything before bank details)
+  const mainTableBody = [
+    [
+      { content: 'TAX BILL', colSpan: 6, styles: { halign: 'center', fontStyle: 'bold', fontSize: 12 } }
+    ],
+    [
+      { content: 'TRITECH SYSTEMS', colSpan: 6, styles: { halign: 'center', fontStyle: 'bold', textColor: [255, 0, 0], fontSize: 14 } }
+    ],
+    [
+      { content: 'All Kind Of HazardousWaste & Non Hazardous waste service care:', colSpan: 6, styles: { halign: 'center', textColor: [0, 150, 0], fontSize: 9 } }
+    ],
+    [
+      { content: '17 A, Kumaran Colony, Ammapalayam, Tirupur, Tamil Nadu, 641654\nCell No: 8940644004\nEmail Id: tritechsystems2011@gmail.com', colSpan: 6, styles: { halign: 'center', fontSize: 9 } }
+    ],
+    [
+      { content: 'GSTIN: 33FCJPS9117J1Z3', colSpan: 3, styles: { fontStyle: 'bold' } },
+      { content: 'PAN No: FCJPS9117J', colSpan: 3, styles: { fontStyle: 'bold' } }
+    ],
+    [
+      { content: `To:\n ${bill.customerName}\n${bill.customerAddress}\nGSTIN: ${bill.customerGstin}`, colSpan: 3 },
+      { content: `Date: ${billDate}\nBill No: ${bill.billNo}\nVehicle No: ${bill.vehicleNo || '-'}`, colSpan: 3 }
+    ],
+    [
+      { content: 'S.No', styles: { halign: 'center', fontStyle: 'bold' } },
+      { content: 'Description', styles: { fontStyle: 'bold' } },
+      { content: 'HSN Code', styles: { halign: 'center', fontStyle: 'bold' } },
+      { content: 'Qty', styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: 'Rate', styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: 'Amount', styles: { halign: 'right', fontStyle: 'bold' } }
+    ],
+    ...itemRows,
+    [
+      { content: 'ADD: CGST 9%', colSpan: 5, styles: { halign: 'right' } },
+      { content: `Rs.${cgst.toFixed(2)}`, styles: { halign: 'right' } }
+    ],
+    [
+      { content: 'ADD: SGST 9%', colSpan: 5, styles: { halign: 'right' } },
+      { content: `Rs.${sgst.toFixed(2)}`, styles: { halign: 'right' } }
+    ],
+    [
+      { content: 'NET AMOUNT', colSpan: 5, styles: { halign: 'right', fontStyle: 'bold' } },
+      { content: `Rs.${(bill.totalAmount ?? 0).toFixed(2)}`, styles: { halign: 'right', fontStyle: 'bold' } }
+    ],
+    [
+      { content: `Rupees In Words: ${convertToWords(Math.round(bill.totalAmount))} Only`, colSpan: 6 }
+    ]
+  ];
+
   autoTable(doc, {
-    startY: y,
-    head: [['S.No', 'Description', 'HSN Code', 'Qty', 'Rate', 'Amount']],
-    body: itemRows,
+    body: mainTableBody,
     theme: 'grid',
-    styles: { fontSize: 9, cellPadding: 2 },
-    columnStyles: {
-      0: { halign: 'center', cellWidth: 10 },
-      2: { halign: 'center', cellWidth: 15 },
-      3: { halign: 'right', cellWidth: 25 },
-      4: { halign: 'right', cellWidth: 30 },
-    },
-    margin: { left: marginX, right: marginX }
+    styles: { fontSize: 9, cellPadding: 2, valign: 'middle' },
+    margin: { left: 5, right: 5 }, // reduced side space
+    startY: 8, // just below logos
+    tableLineWidth: 0.1
   });
 
-  y = doc.lastAutoTable.finalY + 6;
-
-  // GST & Net Amount
-  const cgst = (bill.totalGst ?? 0) / 2;
-  const sgst = (bill.totalGst ?? 0) / 2;
-
-  doc.setFont('helvetica', 'normal');
-  doc.text('ADD: CGST 9%', labelX, y);
-  doc.text(`Rs.${cgst.toFixed(2)}`, valueX, y, alignRight);
-  y += lineHeight;
-
-  doc.text('ADD: SGST 9%', labelX, y);
-  doc.text(`Rs.${sgst.toFixed(2)}`, valueX, y, alignRight);
-  y += lineHeight + 2;
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('NET AMOUNT', labelX, y);
-  doc.text(`Rs.${(bill.totalAmount ?? 0).toFixed(2)}`, valueX, y, alignRight);
-  y += lineHeight;
-
-  doc.setFont('helvetica', 'normal');
-  doc.text(`Rupees In Words: ${convertToWords(Math.round(bill.totalAmount))} Only`, marginX, y);
-  y += lineHeight + 6;
-
-  // Bank Details
-  doc.setFont('helvetica', 'bold').text('BANK DETAILS:', marginX, y);
-  y += lineHeight;
-
+  // Bank Details table immediately after main table (no extra space)
   autoTable(doc, {
-    startY: y,
+    startY: doc.lastAutoTable.finalY + 2,
     head: [['BANK NAME', 'TAMILNADU MERCANTILE BANK', 'KOTAK MAHINDRA BANK']],
     body: [
       ['A/C NUMBER', '384150050800454', '8940644004'],
@@ -294,25 +430,22 @@ export const generateBillPdf = async (bill) => {
     theme: 'grid',
     styles: { fontSize: 9, halign: 'left' },
     headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold' },
-    margin: { left: marginX, right: marginX },
-    columnStyles: {
-      0: { cellWidth: 20 },
-      1: { cellWidth: 35 },
-      2: { cellWidth: 35 },
-    },
+    margin: { left: 5, right: 5 }, // align with top table
+    tableLineWidth: 0.1
   });
 
-  // Signature (bottom of page)
+  // Signature at bottom
+  const pageHeight = doc.internal.pageSize.getHeight();
   const bottomY = pageHeight - 30;
   doc.setFont('helvetica', 'bold');
   doc.text('For TRITECH SYSTEMS', pageWidth - 70, bottomY);
   doc.setFont('helvetica', 'normal');
-  doc.text('PROPRIETOR', pageWidth - 45, bottomY + lineHeight);
+  doc.text('PROPRIETOR', pageWidth - 45, bottomY + 7);
 
   doc.save(`BILL-${bill.billNo || 'Unknown'}.pdf`);
 };
 
-// Amount to Words Converter (Indian Format)
+// Amount to Words Converter
 function convertToWords(num) {
   const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
     'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
